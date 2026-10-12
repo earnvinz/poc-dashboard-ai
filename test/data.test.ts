@@ -3,10 +3,14 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { spawn } from 'node:child_process';
 import { getAnomalies, getDashboardSummary } from '../apps/mcp-server/data.ts';
-import { parseGeminiText } from '../apps/gateway/ai.ts';
+import { parseDashboard, parseGroqText } from '../apps/gateway/ai.ts';
 
-test('parses text from a Gemini interaction', () => {
-  assert.equal(parseGeminiText({ steps: [{ content: [{ type: 'text', text: 'Verified answer' }] }] }), 'Verified answer');
+test('parses text from a Groq response', () => {
+  assert.equal(parseGroqText({ output: [{ type: 'message', content: [{ type: 'output_text', text: 'Verified answer' }] }] }), 'Verified answer');
+});
+
+test('parses the AI dashboard response', () => {
+  assert.deepEqual(parseDashboard({ output: [{ type: 'message', content: [{ type: 'output_text', text: '{"summary":{"month":"2026-09"},"anomalies":[]}' }] }] }), { summary: { month: '2026-09' }, anomalies: [] });
 });
 
 test('seeded September dashboard exposes a Bangkok revenue anomaly', () => {

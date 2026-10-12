@@ -12,18 +12,18 @@ npm run typecheck
 npm run dev
 ```
 
-Open http://localhost:3000. The gateway asks the MCP server for trusted KPIs and anomalies; the frontend never reaches the database or MCP endpoint directly.
+Open http://localhost:3000. Groq calls the trusted MCP tools for both the dashboard and Ask AI flows; the frontend never reaches the database or MCP endpoint directly.
 
-## Optional AI fallback
+## Groq Remote MCP
 
-Copy `.env.example` to `.env`, then set a free Gemini API key to enable the Ask AI form and the fallback for months without dashboard data:
+Copy `.env.example` to `.env`, then set a Groq API key to enable the AI dashboard and Ask AI form:
 
 ```bash
 cp .env.example .env
 npm run dev
 ```
 
-Set `GEMINI_API_KEY=your_key` in `.env`. The default model is `gemini-3.1-flash-lite`; override it with `GEMINI_MODEL` if needed. For direct Remote MCP, set `MCP_REMOTE_URL` and a long `MCP_API_TOKEN`; Gemini can use only the allow-listed dashboard tools for the selected month. Keys stay server-side and are never sent to the browser.
+Set `GROQ_API_KEY=your_key` in `.env`. The default model is `openai/gpt-oss-20b`; override it with `GROQ_MODEL` if needed. For direct Remote MCP, set `MCP_REMOTE_URL` and a long `MCP_API_TOKEN`; Groq can use only the allow-listed dashboard tools for the selected month. Keys stay server-side and are never sent to the browser.
 
 ## MCP tools
 

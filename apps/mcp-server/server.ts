@@ -7,7 +7,8 @@ import { getAnomalies, getDashboardSummary, getRevenueByBranch } from './data.ts
 
 if (existsSync('.env')) process.loadEnvFile('.env');
 
-const app = createMcpExpressApp();
+const tunnelHost = process.env.MCP_REMOTE_URL ? new URL(process.env.MCP_REMOTE_URL).hostname : undefined;
+const app = createMcpExpressApp({ allowedHosts: ['localhost', '127.0.0.1', '[::1]', ...(tunnelHost ? [tunnelHost] : [])] });
 const mcpToken = process.env.MCP_API_TOKEN;
 
 function createServer() {
