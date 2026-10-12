@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AI Dashboard POC</title>
+  <style>body{font-family:system-ui;margin:40px;max-width:900px;color:#172033}header{display:flex;justify-content:space-between;align-items:center}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{padding:18px;border:1px solid #d7dce5;border-radius:10px}.value{font-size:28px;font-weight:700}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}.insight{background:#fff7e6;border-left:4px solid #e68a00;padding:14px;margin:20px 0}small{color:#5e6777}@media(max-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}</style>
+  <body>
+    <header><div><h1>AI Dashboard POC</h1><small id="month"></small></div><input id="monthSelect" type="date" value="2026-09-01" aria-label="Dashboard date"></header>
+    <main id="app">Loading dashboard…</main>
+    <script type="module">
+      const app = document.querySelector('#app');
+      const select = document.querySelector('#monthSelect');
+      const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+      const askForm = '<form id="ask"><label>Ask AI about this month <input name="question" required maxlength="500" placeholder="What needs attention?"></label><button>Ask</button></form><p id="answer"></p>';
+      const selectedMonth = () => select.value.slice(0, 7);
+      async function ask(question) {
+        const response = await fetch('/api/ask', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ month: selectedMonth(), question }) });
+        return response.json();
+      }
+      function bindAsk() {
+        document.querySelector('#ask').addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const answer = document.querySelector('#answer');
+          answer.textContent = 'Thinking…';
+          const result = await ask(new FormData(event.target).get('question'));
+          answer.textContent = result.answer ?? result.error;
+        });
+      }
+      async function load() {
+        const data = await fetch(`/api/dashboard?month=${selectedMonth()}`).then((response) => response.json());
+        if (data.error) {
+          app.innerHTML = `<p>${data.error}. Ask AI for general guidance or choose another month.</p>${askForm}`;
+          bindAsk();
+          return;
+        }
+        const s = data.summary;
+        document.querySelector('#month').textContent = s.month;
+        app.innerHTML = `<section class="grid">${[['Revenue', money.format(s.revenue)], ['Profit', money.format(s.profit)], ['Orders', s.orders.toLocaleString()], ['Customers', s.customers.toLocaleString()]].map(([name, value]) => `<div class="card"><small>${name}</small><div class="value">${value}</div></div>`).join('')}</section><section class="insight"><strong>AI insight (MCP tools)</strong><p>${data.anomalies.length ? `${data.anomalies[0].branch} revenue fell ${Math.abs(data.anomalies[0].changePercent)}% vs. the prior month. Review its sales activity.` : 'No branch revenue drop over 10% detected.'}</p></section>${askForm}<h2>Revenue by branch</h2><table><thead><tr><th>Branch</th><th>Revenue</th><th>Orders</th></tr></thead><tbody>${s.byBranch.map((branch) => `<tr><td>${branch.branch}</td><td>${money.format(branch.revenue)}</td><td>${branch.orders}</td></tr>`).join('')}</tbody></table>`;
+        bindAsk();
+      }
+      select.addEventListener('change', load);
+      load();
+    </script>
+  </body>
+</html>

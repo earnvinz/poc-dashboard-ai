@@ -1,0 +1,21 @@
+{
+  "name": "ai-dashboard-mcp-poc",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "node scripts/seed.ts",
+    "mcp": "node apps/mcp-server/server.ts",
+    "gateway": "node apps/gateway/server.ts",
+    "dev": "node scripts/dev.ts",
+    "test": "node --test test/**/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2"
+  }
+}

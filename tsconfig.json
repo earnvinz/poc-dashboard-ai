@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "module": "nodenext",
+    "noEmit": true,
+    "strict": true,
+    "target": "esnext"
+  },
+  "include": ["apps/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"]
+}
